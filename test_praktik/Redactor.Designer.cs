@@ -91,7 +91,6 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "Redactor";
             this.Text = "Redactor";
-            this.Load += new System.EventHandler(this.Redactor_Load);
             this.ResumeLayout(false);
 
         }

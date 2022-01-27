@@ -5,8 +5,10 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Text;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -29,7 +31,7 @@ namespace test_praktik
         public Main()
         {
             InitializeComponent();
-            if(Wrapper.location != null) Location = Wrapper.location;
+            if (Wrapper.location != null) Location = Wrapper.location;
             MouseDown += Controls_MouseDown;
             new GetControls().Get(this, new Type[] { typeof(Label), typeof(Panel), typeof(PictureBox) }).ToList().ForEach(x => x.MouseDown += Controls_MouseDown);
             pfc.AddFontFile("Minecraft.ttf");
@@ -45,6 +47,7 @@ namespace test_praktik
                 CodeLines.Add(line);
             }
             g = panel1.CreateGraphics();
+            timer1.Start();
         }
         private List<string> CodeLines = new List<string>();
         private Random rnd = new Random();
@@ -56,23 +59,62 @@ namespace test_praktik
         private Font font;
         private Font bigFont;
         private Graphics g;
+        private ParallelOptions parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount * 2 };
+        private readonly object _lock = new object();
+        private readonly object _lock2 = new object();
         private void timer1_Tick(object sender, EventArgs e)
         {
-            g.FillPolygon(fillBrush, new Point[4] { new Point(0, 0), new Point(0, panel1.Height), new Point(panel1.Width, panel1.Height), new Point(panel1.Width, 0)});
-            string line = "";
-            CodeLines.RemoveAt(0);
-            for(int o = 0; o < 100; o += 1)
-                line += rnd.Next(-100, 100) > 0 ? "1" : "0";
-            CodeLines.Add(line);
-            for (int i = 0; i < 25; i += 1)
-                g.DrawString(CodeLines[i], font, drawBrush, 0, i * 25);            
+            new Thread(() => {
+                lock (_lock2) 
+                {
+                    g.FillPolygon(fillBrush, new Point[4] { new Point(0, 0), new Point(0, panel1.Height), new Point(panel1.Width, panel1.Height), new Point(panel1.Width, 0) });
+                    string line = "";
+                    CodeLines.RemoveAt(0);
+                    for (int o = 0; o < 100; o += 1)
+                        line += rnd.Next(-100, 100) > 0 ? "1" : "0";
+                    CodeLines.Add(line);
+                    Parallel.For(0, 25, parallelOptions, i =>
+                    {
+                        lock (_lock)
+                        {
+                            g.DrawString(CodeLines[i], font, drawBrush, 0, i * 25);
+                        }
+                    });
+                }
+                    
+            }).Start();
         }
         private void button2_Click(object sender, EventArgs e) => Process.GetCurrentProcess().Kill();
         private void button1_Click(object sender, EventArgs e)
         {
-            new Redactor(){ Location = Wrapper.location }.Show();
-            Hide();
+            if (Directory.Exists(Wrapper.path))
+            {
+                new Redactor() { Location = Wrapper.location }.Show();
+                UnLoad();
+                Hide();
+            }
+            else MessageBox.Show("Don`t Found Folder.", "Error");
         }
-        
+        [STAThread]
+        private void button3_Click(object sender, EventArgs e)
+        {            
+            using (var fbd = new FolderBrowserDialog())
+            {
+                DialogResult result = fbd.ShowDialog();
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                {
+                    Wrapper.path = fbd.SelectedPath;
+                    textBox1.Text = fbd.SelectedPath;
+                }
+            }                       
+        }
+        private void UnLoad()
+        {
+            timer1.Stop();
+        }
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            Wrapper.path = textBox1.Text;
+        }
     }
 }
