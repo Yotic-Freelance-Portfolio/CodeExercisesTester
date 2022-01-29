@@ -76,6 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Answer.cs" />
     <Compile Include="Exercise.cs" />
     <Compile Include="GetControls.cs" />
     <Compile Include="Main.cs">
@@ -92,6 +93,7 @@
     <Compile Include="Redactor.Designer.cs">
       <DependentUpon>Redactor.cs</DependentUpon>
     </Compile>
+    <Compile Include="SharePath.cs" />
     <Compile Include="Tabs.cs" />
     <Compile Include="Wrapper.cs" />
     <EmbeddedResource Include="Main.resx">

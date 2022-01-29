@@ -11,8 +11,9 @@ namespace test_praktik
     internal sealed class Wrapper
     {
         internal static string path;
+        internal static string pathToSave;
         internal static Point location;
-        internal static List<Form> exercisesForm = new List<Form>();
-        internal static List<Exercise> exercises = new List<Exercise>();
+        internal static Form redactor;
+        internal static Form main;
     }
 }

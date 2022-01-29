@@ -15,13 +15,13 @@ internal class Tabs
     private Panel TabOwner;
     private Panel Display;
     internal List<Tab> Tabses = new List<Tab>();
+    internal Tabs(ref Panel panel, ref Panel formDisplay) : this(ref panel, ref formDisplay, false) { }
     internal Tabs(ref Panel panel, ref Panel formDisplay, bool vertical)
     {
         TabOwner = panel;
         Display = formDisplay;
         this.vertical = vertical;
     }
-    internal Tabs(ref Panel panel, ref Panel formDisplay) : this(ref panel, ref formDisplay, false) { }
     internal void AddTab(Tab tab)
     {
         Tabses.Add(tab);
@@ -40,11 +40,20 @@ internal class Tabs
         {
             Tabses[preSelect].TabButton.TextAlign = ContentAlignment.MiddleLeft;
             ReloadTab();
-            Graphics preSelectG = Tabses[preSelect].TabButton.CreateGraphics();
-            preSelectG.DrawPolygon(new Pen(Color.FromArgb(56, 56, 56)), Tabses[select].rects);
         }
-        Graphics selectG = Tabses[select].TabButton.CreateGraphics();
-        selectG.DrawPolygon(new Pen(Color.FromArgb(255, 56, 255)), Tabses[select].rects);
+    }
+    internal void Select(int newSelect)
+    {
+        if(newSelect < Tabses.Count)
+        {
+            int preSelect = select;
+            select = newSelect;
+            if (preSelect != select)
+            {
+                Tabses[preSelect].TabButton.TextAlign = ContentAlignment.MiddleLeft;
+                ReloadTab();
+            }
+        }
     }
     private void ReloadTab()
     {
@@ -80,8 +89,25 @@ internal class Tabs
             TabButton.FlatAppearance.MouseDownBackColor = Color.FromArgb(69, 69, 69);
             TabButton.TextAlign = ContentAlignment.MiddleLeft;
             g = TabButton.CreateGraphics();
-            TabButton.MouseEnter += new EventHandler((object sender, EventArgs e) => { TabButton.Font = new Font("Open Sans Semibold", 12.1F, FontStyle.Bold, GraphicsUnit.Point, 204); });
-            TabButton.MouseLeave += new EventHandler((object sender, EventArgs e) => { TabButton.Font = new Font("Open Sans Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, 204); });
+            TabButton.MouseLeave += Leave;
+            TabButton.MouseEnter += Enter;
+        }
+        public void CancelBackColor(Color color)
+        {
+            TabButton.MouseLeave -= Leave;
+            TabButton.MouseEnter -= Enter;
+            TabButton.BackColor = color;
+            TabButton.FlatAppearance.MouseDownBackColor = color;
+            TabButton.FlatAppearance.MouseOverBackColor = color;
+            TabButton.FlatAppearance.CheckedBackColor = color;
+        }
+        private void Enter(object sender, EventArgs e)
+        {
+            TabButton.Font = new Font("Open Sans Semibold", 12.1F, FontStyle.Bold, GraphicsUnit.Point, 204);
+        }
+        private void Leave(object sender, EventArgs e)
+        {
+            TabButton.Font = new Font("Open Sans Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
         }
         internal Tab(string name, Form form, int index, Size size) : this(name, form, index, size, false) { }
         private Graphics g { get; set; }

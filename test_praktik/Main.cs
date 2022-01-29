@@ -36,7 +36,6 @@ namespace test_praktik
             new GetControls().Get(this, new Type[] { typeof(Label), typeof(Panel), typeof(PictureBox) }).ToList().ForEach(x => x.MouseDown += Controls_MouseDown);
             pfc.AddFontFile("Minecraft.ttf");
             font = new Font(pfc.Families[0], 12, FontStyle.Regular);
-            bigFont = new Font(pfc.Families[0], 72, FontStyle.Regular);
             for (int i = 0; i < 25; i += 1)
             {
                 string line = "";
@@ -48,16 +47,19 @@ namespace test_praktik
             }
             g = panel1.CreateGraphics();
             timer1.Start();
+            Wrapper.main = this;
+            Wrapper.path = textBox1.Text;
+            Wrapper.pathToSave = textBox2.Text;
+            SharePath.SetRoundedShape(button1, 15, true, true, true, true);
+            SharePath.SetRoundedShape(button2, 15, true, true, true, true);
+            SharePath.SetRoundedShape(button3, 15, true, true, true, true);
         }
         private List<string> CodeLines = new List<string>();
         private Random rnd = new Random();
-        private Pen pen = new Pen(Color.LightGreen);
         private Brush drawBrush = new SolidBrush(Color.Green);
-        private Brush fillBrush = new SolidBrush(Color.FromArgb(47, 47, 47));
-        private Brush bigBrush = new SolidBrush(Color.DarkGreen);
+        private Brush fillBrush = new SolidBrush(Color.FromArgb(56, 56, 56));
         private PrivateFontCollection pfc = new PrivateFontCollection();
         private Font font;
-        private Font bigFont;
         private Graphics g;
         private ParallelOptions parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount * 2 };
         private readonly object _lock = new object();
@@ -89,7 +91,9 @@ namespace test_praktik
         {
             if (Directory.Exists(Wrapper.path))
             {
-                new Redactor() { Location = Wrapper.location }.Show();
+                if (Wrapper.redactor == null) Wrapper.redactor = new Redactor();
+                Wrapper.redactor.Location = Location;
+                Wrapper.redactor.Show();
                 UnLoad();
                 Hide();
             }
@@ -115,6 +119,16 @@ namespace test_praktik
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
             Wrapper.path = textBox1.Text;
+        }
+        private void Main_Paint(object sender, PaintEventArgs e)
+        {
+            g = panel1.CreateGraphics();
+            timer1.Start();
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            Wrapper.pathToSave = textBox2.Text;
         }
     }
 }

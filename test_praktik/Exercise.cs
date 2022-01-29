@@ -7,14 +7,12 @@ using System.Text.Json;
 
 namespace test_praktik
 {
-    [Serializable]
     internal class Exercise
     {
-        internal string Name { get; set; }
-        internal string Disription { get; set; }
-        internal string StartCode { get; set; }
-        internal string[] Answers { get; set; }
-        internal int GoodAnswer { get; set; }
-        public string hui;
+        public string Name { get; set; }
+        public string Desription { get; set; }
+        public string StartCode { get; set; }
+        public string[] Answers { get; set; }
+        public int GoodAnswer { get; set; }
     }
 }
